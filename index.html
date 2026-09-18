@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEVON - Token Launchpad on Robinhood</title>
+  <meta name="description" content="Launch your own token on Robinhood Chain with automated bonding curves. Deploy, trade, and manage tokens with AEVON.">
+  <meta property="og:title" content="AEVON - Token Launchpad on Robinhood">
+  <meta property="og:description" content="Launch your own token on Robinhood Chain with automated bonding curves. Deploy, trade, and manage tokens with AEVON.">
+  <meta property="og:image" content="assets/logo.png">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="AEVON - Token Launchpad on Robinhood">
+  <meta name="twitter:description" content="Launch your own token on Robinhood Chain with automated bonding curves.">
+  <meta name="twitter:image" content="assets/logo.png">
+  <meta name="theme-color" content="#4F8CFF">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo" data-link>
+        <img src="assets/logo.png" alt="AEVON" class="logo-img">
+        <span class="logo-text">AEVON</span>
+      </a>
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+        <span class="toggle-thumb">
+          <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </span>
+      </button>
+      <div class="nav-right">
+        <div class="nav-links">
+          <a href="/" class="nav-link active" data-link>Explore</a>
+          <a href="/create" class="nav-link" data-link>Create</a>
+          <a href="/portfolio" class="nav-link" data-link>Portfolio</a>
+        </div>
+        <button class="btn-connect" id="btnConnect">
+          <span>Connect</span>
+        </button>
+      </div>
+      <button class="mobile-menu" id="mobileMenu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Nav -->
+  <div class="mobile-nav" id="mobileNav">
+    <a href="/" class="nav-link active" data-link>Explore</a>
+    <a href="/create" class="nav-link" data-link>Create</a>
+    <a href="/portfolio" class="nav-link" data-link>Portfolio</a>
+    <button class="btn-connect mobile" id="btnConnectMobile">Connect Wallet</button>
+  </div>
+
+  <!-- Recent Buys Ticker -->
+  <div class="ticker-bar" id="tickerBar">
+    <div class="ticker-label">
+      <span class="ticker-dot"></span>
+      Live
+    </div>
+    <div class="ticker-track">
+      <div class="ticker-content" id="tickerContent">
+        <span class="ticker-placeholder">Watching for trades...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-bar" id="searchBar">
+    <div class="search-bar-inner">
+      <div class="search-bar-input">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search tokens by name or symbol..." id="globalSearch">
+      </div>
+      <a href="/create" class="btn btn-primary" data-link>+ Create</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main id="app"></main>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Templates -->
+  <template id="tpl-home">
+    <!-- Official Token -->
+    <section class="official-section" id="officialSection" style="display:none">
+      <div class="official-cards" id="officialCards">
+        <!-- Official tokens loaded dynamically -->
+      </div>
+    </section>
+
+    <section class="token-section" id="tokenList">
+      <div class="section-header">
+        <div class="section-header-left">
+          <h2 class="section-title">Explore</h2>
+          <span class="section-count" id="statTokens">0</span>
+        </div>
+      </div>
+      <div class="sort-bar" id="sortBar">
+        <button class="sort-btn active" data-sort="newest">Newest</button>
+        <button class="sort-btn" data-sort="mcap">Market Cap</button>
+        <button class="sort-btn" data-sort="recent">Recent Buys</button>
+
+      </div>
+      <div class="token-grid" id="tokenGrid">
+        <!-- Tokens loaded dynamically -->
+      </div>
+    </section>
+  </template>
+
+  <template id="tpl-create">
+    <section class="create-page">
+      <div class="create-layout">
+        <div class="create-main">
+          <a href="/" data-link class="create-back">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+          </a>
+          <form id="createForm" class="create-form-card">
+            <div class="create-card-header">
+              <h1>Launch token</h1>
+            </div>
+
+            <div class="form-row-inline">
+              <div class="form-group form-grow">
+                <label for="tokenName">Name</label>
+                <input type="text" id="tokenName" placeholder="e.g. Doge Coin" required maxlength="32">
+              </div>
+              <div class="form-group" style="width:140px;flex-shrink:0">
+                <label for="tokenSymbol">Ticker</label>
+                <input type="text" id="tokenSymbol" placeholder="e.g. DOGE" required maxlength="8" style="text-transform:uppercase">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="tokenDesc">Description</label>
+              <textarea id="tokenDesc" placeholder="Tell people about your token..." rows="3" maxlength="500"></textarea>
+              <span class="form-hint"><span id="descCount">0</span>/500</span>
+            </div>
+
+            <div class="form-group">
+              <label>Token image</label>
+              <div class="logo-upload-row" id="logoUpload">
+                <input type="file" id="tokenLogo" accept="image/*" hidden>
+                <button type="button" class="btn-choose-image" id="btnChooseImage">Choose image</button>
+                <span class="form-hint" style="margin:0">PNG, JPG, WebP. Max 2MB</span>
+                <img id="logoPreview" class="logo-thumb-img" alt="" hidden>
+              </div>
+            </div>
+
+            <div class="form-row-inline">
+              <div class="form-group form-grow">
+                <label for="tokenTwitter">X profile</label>
+                <div class="prefixed-input">
+                  <span class="input-prefix">x.com/</span>
+                  <input type="text" id="tokenTwitter" placeholder="username">
+                </div>
+              </div>
+              <div class="form-group form-grow">
+                <label for="tokenTelegram">Telegram</label>
+                <div class="prefixed-input">
+                  <span class="input-prefix">t.me/</span>
+                  <input type="text" id="tokenTelegram" placeholder="group">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Paired asset</label>
+              <div class="pair-select" id="pairSelect">
+                <button type="button" class="pair-select-btn" id="pairSelectBtn">
+                  <img class="pair-select-img" id="pairSelectedImg" src="assets/pairs/ethereum.svg" alt="">
+                  <span id="pairSelectedSymbol">ETH</span>
+                  <svg class="pair-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="pair-dropdown" id="pairDropdown"></div>
+              </div>
+              <span class="form-hint" id="pairHint">Graduates once the curve raises 4.2 ETH</span>
+            </div>
+
+            <div class="form-group">
+              <label for="initialBuy">Developer buy</label>
+              <div class="suffixed-input">
+                <input type="number" id="initialBuy" placeholder="0.0" step="any" min="0">
+                <span class="input-suffix">ETH</span>
+              </div>
+              <span class="form-hint">Optional — buy tokens at launch for yourself</span>
+            </div>
+
+            <div class="advanced-section" id="advancedSection">
+              <button type="button" class="advanced-toggle" id="advancedToggle">
+                <span>Advanced</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="advanced-body" id="advancedBody">
+                <div class="form-group">
+                  <label for="creatorTax">Creator tax (%)</label>
+                  <input type="number" id="creatorTax" placeholder="0" min="0" max="10" step="1" value="0">
+                  <span class="form-hint">Traders pay 1.00% in total, up to 10% of it yours</span>
+                </div>
+                <div class="form-group">
+                  <label for="tokenDiscord">Discord</label>
+                  <div class="prefixed-input">
+                    <span class="input-prefix">discord.gg/</span>
+                    <input type="text" id="tokenDiscord" placeholder="invite">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="tokenWebsite">Website</label>
+                  <input type="url" id="tokenWebsite" placeholder="https://...">
+                </div>
+              </div>
+            </div>
+
+            <div class="create-footer">
+              <div class="footer-info">
+                <span class="footer-pair">ETH pair</span>
+                <span class="footer-fee">ETH <span id="launchFeeDisplay">0.0005</span> due</span>
+              </div>
+              <button type="submit" class="btn btn-primary btn-deploy" id="btnCreate">Deploy Token</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="create-sidebar">
+          <div class="sidebar-preview">
+            <div class="sp-logo" id="previewLogo">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.4"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+            <h2 class="sp-name" id="previewName">Your token</h2>
+            <p class="sp-ticker" id="previewSymbol">$TICKER</p>
+
+            <div class="sp-stats">
+              <div class="sp-stat-row">
+                <span class="sp-stat-label">Launch fee</span>
+                <span class="sp-stat-value"><span class="sp-eth-icon">&#9830;</span> <span id="previewFee">0.0005</span> ETH</span>
+              </div>
+              <div class="sp-stat-row">
+                <span class="sp-stat-label">Paired with</span>
+                <span class="sp-stat-value">ETH</span>
+              </div>
+              <div class="sp-stat-row">
+                <span class="sp-stat-label">Trade fee</span>
+                <span class="sp-stat-value">1.00%</span>
+              </div>
+              <div class="sp-stat-row">
+                <span class="sp-stat-label">Launch window</span>
+                <span class="sp-stat-value">99% snipe tax, 3s</span>
+              </div>
+              <div class="sp-stat-row">
+                <span class="sp-stat-label">Graduation</span>
+                <span class="sp-stat-value">4.2 ETH</span>
+              </div>
+              <div class="sp-stat-row">
+                <span class="sp-stat-label">Liquidity</span>
+                <span class="sp-stat-value sp-locked">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Locked
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <template id="tpl-portfolio">
+    <section class="portfolio-page">
+      <div class="portfolio-container">
+        <div class="portfolio-header">
+          <h1>Your Portfolio</h1>
+          <p>Manage your tokens and holdings on Robinhood</p>
+        </div>
+        <div class="portfolio-grid" id="portfolioContent">
+          <div class="connect-prompt" id="portfolioPrompt">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <h2>Connect Your Wallet</h2>
+            <p>Connect your wallet to view your tokens and trading history</p>
+            <button class="btn btn-primary" onclick="window.walletManager.connect()">Connect Wallet</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <template id="tpl-token">
+    <section class="token-page">
+      <div class="token-detail-container" id="tokenDetailContent">
+        <!-- Loaded dynamically -->
+      </div>
+    </section>
+  </template>
+
+  <template id="tpl-how">
+    <section class="info-page">
+      <div class="info-container">
+        <div class="info-hero">
+          <h1>How it Works</h1>
+          <p class="info-subtitle">Launch and trade tokens on Robinhood Chain in minutes</p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <h3>Connect Wallet</h3>
+            <p>Connect your MetaMask or any EVM-compatible wallet. AEVON will automatically switch you to Robinhood Chain (Chain ID 4663).</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.27 5.82 22 7 14.14l-5-4.87 6.91-1.01z"/></svg>
+            </div>
+            <h3>Create Token</h3>
+            <p>Fill in your token name, symbol, description, and image. Set optional social links and creator tax. Pay a small launch fee in ETH.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <h3>Bonding Curve</h3>
+            <p>Your token launches on an automated bonding curve. Early buyers get lower prices. The price increases as more people buy.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            </div>
+            <h3>Trade</h3>
+            <p>Buy and sell tokens instantly through the bonding curve. Set your slippage tolerance. View real-time price charts and recent trades.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">5</div>
+            <div class="step-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+            <h3>Graduation</h3>
+            <p>Once the bonding curve raises 4.2 ETH, the token graduates. Liquidity is locked and moves to a Uniswap V4 pool automatically.</p>
+          </div>
+
+          <div class="step-card">
+            <div class="step-number">6</div>
+            <div class="step-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <h3>Liquidity Locked</h3>
+            <p>After graduation, liquidity is permanently locked. No rug pulls. The token is freely tradeable on decentralized exchanges.</p>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h2>Fee Structure</h2>
+          <div class="fee-table">
+            <div class="fee-row">
+              <span class="fee-label">Launch fee</span>
+              <span class="fee-value">0.0005 ETH</span>
+            </div>
+            <div class="fee-row">
+              <span class="fee-label">Trade fee</span>
+              <span class="fee-value">1.00%</span>
+            </div>
+            <div class="fee-row">
+              <span class="fee-label">Creator tax</span>
+              <span class="fee-value">Up to 10% of trade fee</span>
+            </div>
+            <div class="fee-row">
+              <span class="fee-label">Snipe protection</span>
+              <span class="fee-value">99% tax for first 3 seconds</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-section">
+          <h2>Token Supply</h2>
+          <p>Every token launched on AEVON has a fixed supply of <strong>1,000,000,000</strong> tokens. The supply is set at launch and cannot be changed. No minting, no inflation.</p>
+        </div>
+
+        <div class="info-cta">
+          <a href="/create" class="btn btn-primary" data-link>Launch Your Token</a>
+          <a href="/docs" class="btn btn-outline" data-link>Read the Docs</a>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <template id="tpl-docs">
+    <section class="info-page">
+      <div class="info-container">
+        <div class="info-hero">
+          <h1>Documentation</h1>
+          <p class="info-subtitle">Technical reference for the AEVON Token Launchpad</p>
+        </div>
+
+        <div class="docs-layout">
+          <nav class="docs-sidebar" id="docsSidebar">
+            <div class="docs-nav-group">
+              <span class="docs-nav-title">Getting Started</span>
+              <a href="#" class="docs-nav-link active" data-doc="overview">Overview</a>
+              <a href="#" class="docs-nav-link" data-doc="chain">Robinhood Chain</a>
+              <a href="#" class="docs-nav-link" data-doc="wallet">Wallet Setup</a>
+            </div>
+            <div class="docs-nav-group">
+              <span class="docs-nav-title">Token Launch</span>
+              <a href="#" class="docs-nav-link" data-doc="create">Creating a Token</a>
+              <a href="#" class="docs-nav-link" data-doc="bonding">Bonding Curve</a>
+              <a href="#" class="docs-nav-link" data-doc="graduation">Graduation</a>
+            </div>
+            <div class="docs-nav-group">
+              <span class="docs-nav-title">Trading</span>
+              <a href="#" class="docs-nav-link" data-doc="buy">Buying Tokens</a>
+              <a href="#" class="docs-nav-link" data-doc="sell">Selling Tokens</a>
+              <a href="#" class="docs-nav-link" data-doc="slippage">Slippage</a>
+            </div>
+            <div class="docs-nav-group">
+              <span class="docs-nav-title">Contracts</span>
+              <a href="#" class="docs-nav-link" data-doc="contracts">Contract Addresses</a>
+              <a href="#" class="docs-nav-link" data-doc="abi">ABI Reference</a>
+            </div>
+          </nav>
+
+          <div class="docs-content" id="docsContent">
+          </div>
+        </div>
+      </div>
+    </section>
+  </template>
+
+  <!-- Privacy Policy -->
+  <template id="tpl-privacy">
+    <section class="info-page legal-page">
+      <div class="legal-content">
+        <h1>Privacy Policy</h1>
+        <p class="legal-updated">Last updated: September 2026</p>
+
+        <h2>1. Introduction</h2>
+        <p>AEVON ("we," "our," or "the platform") is a decentralized token launchpad operating on Robinhood Chain. This Privacy Policy explains how we handle information when you use our platform.</p>
+
+        <h2>2. Information We Collect</h2>
+        <p>AEVON is a non-custodial platform. We do not collect personal information, create user accounts, or store private keys. The only data processed is:</p>
+        <ul>
+          <li><strong>Wallet addresses</strong> — publicly visible on-chain data used to display portfolio and transaction history</li>
+          <li><strong>Transaction data</strong> — read from the Robinhood Chain blockchain, which is public by design</li>
+          <li><strong>Usage analytics</strong> — anonymous page views and interaction patterns to improve the platform (no cookies or personal identifiers)</li>
+        </ul>
+
+        <h2>3. Blockchain Data</h2>
+        <p>All transactions on Robinhood Chain are public and immutable. When you interact with AEVON smart contracts, your wallet address and transaction details are permanently recorded on the blockchain. This is inherent to blockchain technology and is not controlled by AEVON.</p>
+
+        <h2>4. Third-Party Services</h2>
+        <p>We interact with the following external services:</p>
+        <ul>
+          <li><strong>Robinhood Chain RPC</strong> — to read and submit blockchain transactions</li>
+          <li><strong>Blockscout Explorer API</strong> — to fetch token data, holder information, and transaction history</li>
+          <li><strong>CoinGecko API</strong> — to retrieve current ETH market prices</li>
+        </ul>
+        <p>Each service operates under its own privacy policy. We do not share any user data with these providers beyond what is required for their core functionality.</p>
+
+        <h2>5. Data Storage</h2>
+        <p>AEVON does not maintain databases of user information. Theme preferences and session data are stored locally in your browser and can be cleared at any time.</p>
+
+        <h2>6. Security</h2>
+        <p>All smart contract interactions are signed directly by your wallet. AEVON never has access to your private keys or seed phrases. You are solely responsible for securing your wallet credentials.</p>
+
+        <h2>7. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy periodically. Changes will be reflected on this page with an updated revision date.</p>
+
+        <h2>8. Contact</h2>
+        <p>For questions about this policy, reach out via our official channels on X (Twitter).</p>
+      </div>
+    </section>
+  </template>
+
+  <!-- Terms of Use -->
+  <template id="tpl-terms">
+    <section class="info-page legal-page">
+      <div class="legal-content">
+        <h1>Terms of Use</h1>
+        <p class="legal-updated">Last updated: September 2026</p>
+
+        <h2>1. Acceptance of Terms</h2>
+        <p>By accessing or using AEVON, you agree to be bound by these Terms of Use. If you do not agree, do not use the platform.</p>
+
+        <h2>2. Platform Description</h2>
+        <p>AEVON is a decentralized token launchpad on Robinhood Chain that enables users to create and trade fixed-supply tokens using bonding curve mechanics. The platform provides a front-end interface for interacting with on-chain smart contracts.</p>
+
+        <h2>3. Non-Custodial Nature</h2>
+        <p>AEVON is entirely non-custodial. We do not hold, control, or have access to your funds, tokens, or private keys at any time. All transactions are executed directly between your wallet and the smart contracts deployed on Robinhood Chain.</p>
+
+        <h2>4. Eligibility</h2>
+        <p>You must be of legal age in your jurisdiction to use this platform. You are responsible for ensuring that your use of AEVON complies with all applicable laws and regulations in your jurisdiction.</p>
+
+        <h2>5. Risk Disclosure</h2>
+        <p>By using AEVON, you acknowledge and accept the following risks:</p>
+        <ul>
+          <li>Token values are highly volatile and can decrease to zero</li>
+          <li>Blockchain transactions are irreversible once confirmed</li>
+          <li>Smart contracts may contain undiscovered vulnerabilities</li>
+          <li>Bonding curve mechanics mean that token prices fluctuate based on supply and demand</li>
+          <li>Network congestion may affect transaction timing and gas costs</li>
+          <li>Regulatory changes may impact the availability or legality of certain features</li>
+        </ul>
+
+        <h2>6. Prohibited Uses</h2>
+        <p>You agree not to use AEVON to:</p>
+        <ul>
+          <li>Launch tokens intended to defraud or mislead others</li>
+          <li>Manipulate markets through wash trading or coordinated schemes</li>
+          <li>Violate any applicable laws, regulations, or third-party rights</li>
+          <li>Interfere with the platform's infrastructure or smart contracts</li>
+          <li>Impersonate other users, projects, or entities</li>
+        </ul>
+
+        <h2>7. No Financial Advice</h2>
+        <p>Nothing on AEVON constitutes financial, investment, legal, or tax advice. All trading decisions are your own. We strongly recommend conducting your own research before creating or purchasing any token.</p>
+
+        <h2>8. Fees</h2>
+        <p>AEVON charges a 1% fee on bonding curve transactions. Additionally, standard Robinhood Chain gas fees apply to all on-chain interactions. Fee structures may be updated; changes will be communicated through the platform.</p>
+
+        <h2>9. Limitation of Liability</h2>
+        <p>AEVON is provided "as is" without warranties of any kind, express or implied. To the maximum extent permitted by law, we shall not be liable for any direct, indirect, incidental, or consequential damages arising from your use of the platform.</p>
+
+        <h2>10. Intellectual Property</h2>
+        <p>The AEVON name, logo, interface design, and associated materials are proprietary. Users retain ownership of tokens they create, subject to applicable laws.</p>
+
+        <h2>11. Modifications</h2>
+        <p>We reserve the right to modify these terms at any time. Continued use of AEVON after changes are posted constitutes acceptance of the revised terms.</p>
+
+        <h2>12. Contact</h2>
+        <p>For questions regarding these Terms, reach out via our official channels on X (Twitter).</p>
+      </div>
+    </section>
+  </template>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="/" class="footer-logo" data-link>
+            <img src="assets/logo.png" alt="AEVON" class="logo-img">
+            <span class="logo-text">AEVON</span>
+          </a>
+          <p class="footer-desc">Launch and trade fixed-supply tokens on Robinhood Chain. All transactions are executed directly through your wallet — AEVON never takes custody of your assets.</p>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-heading">Product</h4>
+          <a href="/" class="footer-link" data-link>Explore</a>
+          <a href="/create" class="footer-link" data-link>Create</a>
+          <a href="/portfolio" class="footer-link" data-link>Portfolio</a>
+          <a href="/docs" class="footer-link" data-link>Docs</a>
+          <a href="/how" class="footer-link" data-link>How it Works</a>
+        </div>
+        <div class="footer-col">
+          <h4 class="footer-heading">Legal</h4>
+          <a href="/privacy" class="footer-link" data-link>Privacy Policy</a>
+          <a href="/terms" class="footer-link" data-link>Terms of Use</a>
+        </div>
+        <div class="footer-col footer-risk">
+          <h4 class="footer-heading">Risk Notice</h4>
+          <p class="footer-risk-text">Transactions are submitted through your wallet and may be irreversible. Tokens can be volatile or lose all value. AEVON does not provide custody, warranties, or financial advice. Trade responsibly.</p>
+        </div>
+        <div class="footer-bottom">
+          <span class="footer-copy">&copy; 2026 AEVON. All rights reserved.</span>
+          <div class="footer-socials">
+            <a href="https://x.com/Aevonpad" target="_blank" rel="noopener" class="footer-social" title="@Aevonpad on X">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <span>@Aevonpad</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="js/pairs.js"></script>
+  <script src="js/contracts.js"></script>
+  <script src="js/pons-api.js"></script>
+  <script src="js/wallet.js"></script>
+  <script src="js/registry.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
